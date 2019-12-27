@@ -2,43 +2,67 @@ import 'package:flutter/material.dart';
 
 import '../models/transaction.dart';
 
-class TxInput extends StatelessWidget {
+class TxInput extends StatefulWidget {
   final Function addTx;
 
   TxInput(this.addTx);
 
-  TextEditingController titleController = TextEditingController();
-  TextEditingController amountController = TextEditingController();
+  @override
+  _TxInputState createState() => _TxInputState();
+}
+
+class _TxInputState extends State<TxInput> {
+  final TextEditingController titleController = TextEditingController();
+
+  final TextEditingController amountController = TextEditingController();
+
+  void submitData() {
+    final enteredTitle = titleController.text;
+    final enteredAmount = double.parse(amountController.text);
+
+    if (enteredTitle.isEmpty || enteredAmount <= 0) return;
+
+    widget.addTx(
+      enteredTitle,
+      enteredAmount,
+    );
+
+    // Closes the most top widget
+    Navigator.of(context).pop();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: <Widget>[
-        TextField(
-          controller: titleController,
-          decoration: InputDecoration(labelText: 'What did you spend on?'),
-          autofocus: true,
-          cursorColor: Colors.black,
-          // onChanged: print,
-        ),
-        TextField(
-          controller: amountController,
-          decoration: InputDecoration(labelText: 'How much did you spend?'),
-          autofocus: true,
-        ),
-        Padding(
-          padding: const EdgeInsets.only(top: 8),
-          child: FlatButton(
-            child: Text('Add Transaction'),
-            textColor: Colors.purple,
-            onPressed: () => addTx(
-              titleController.text,
-              double.parse(amountController.text),
-            ),
+    return Container(
+      margin: EdgeInsets.all(10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: <Widget>[
+          TextField(
+            controller: titleController,
+            decoration: InputDecoration(hintText: 'Title'),
+            // autofocus: true,
+            cursorColor: Colors.black,
+            // onSubmitted: (_) => submitData(),
+            // onChanged: print,
           ),
-        )
-      ],
+          TextField(
+            controller: amountController,
+            decoration: InputDecoration(hintText: 'Amount'),
+            autofocus: true,
+            keyboardType: TextInputType.number,
+            // onSubmitted: (_) => submitData(),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: FlatButton(
+              child: Text('Add Transaction'),
+              textColor: Colors.purple,
+              onPressed: submitData,
+            ),
+          )
+        ],
+      ),
     );
   }
 }

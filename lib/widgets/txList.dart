@@ -18,14 +18,32 @@ class TxList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 700,
-      child: ListView.builder(
-        itemCount: transactions.length,
-        itemBuilder: (context, idx) {
-          return buildCard(transactions[idx]);
-        },
-        // children: transactions.map(buildCard).toList(),
-      ),
+      height: 500,
+      child: transactions.length != 0
+          ? ListView.builder(
+              itemCount: transactions.length,
+              itemBuilder: (context, idx) {
+                return buildCard(transactions[idx]);
+              },
+              // children: transactions.map(buildCard).toList(),
+            )
+          : Column(
+              children: <Widget>[
+                Text(
+                  'No transactions added yet!',
+                  style: Theme.of(context).textTheme.title,
+                ),
+                SizedBox(
+                  height: 50,
+                ),
+                Container(
+                    height: 200,
+                    child: Image.asset(
+                      'assets/images/waiting.png',
+                      fit: BoxFit.cover,
+                    )),
+              ],
+            ),
     );
   }
 }

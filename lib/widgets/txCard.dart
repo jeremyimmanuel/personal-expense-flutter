@@ -19,7 +19,7 @@ class TxCard extends StatelessWidget {
             margin: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
             padding: EdgeInsets.all(10),
             child: Text(
-              "\$${tx.amount}",
+              "\$${tx.amount.toStringAsFixed(2)}",
               style: TextStyle(
                 color: Colors.purple,
                 fontSize: 20,
@@ -29,7 +29,7 @@ class TxCard extends StatelessWidget {
             decoration: BoxDecoration(
               border: Border.all(
                 width: 3,
-                color: Colors.purple,
+                color: Theme.of(context).primaryColor,
               ),
             ),
           ),
