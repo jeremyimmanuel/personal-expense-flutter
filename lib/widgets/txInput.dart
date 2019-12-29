@@ -1,7 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../models/transaction.dart';
+import '../widgets/adaptiveButton.dart';
 
 class TxInput extends StatefulWidget {
   final Function addTx;
@@ -36,7 +37,7 @@ class _TxInputState extends State<TxInput> {
     Navigator.of(context).pop();
   }
 
-  void _presentDatePicket() {
+  void _presentDatePicker() {
     showDatePicker(
       context: context,
       initialDate: DateTime.now(),
@@ -89,14 +90,7 @@ class _TxInputState extends State<TxInput> {
                         ? 'No Date Chosen!'
                         : DateFormat.yMd().format(_selectedDate)),
                   ),
-                  FlatButton(
-                    child: Text(
-                      'Pick Date',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    onPressed: _presentDatePicket,
-                    textColor: Theme.of(context).primaryColor,
-                  ),
+                  AdaptiveFlatButton('Pick Date', _presentDatePicker),
                 ],
               ),
             ),
