@@ -26,8 +26,13 @@ class Chart extends StatelessWidget {
         'day': DateFormat.E().format(weekDay).substring(0, 1),
         'amount': totalSum,
       };
-      print(ret);
       return ret;
+    }).reversed.toList();
+  }
+
+  double get totalSpending {
+    return groupTxVals.fold(0.0, (sum, item) {
+      return sum + item['amount'];
     });
   }
 
@@ -36,11 +41,22 @@ class Chart extends StatelessWidget {
     return Card(
       elevation: 6,
       margin: EdgeInsets.all(20),
-      child: Row(
-        children: 
-          groupTxVals.map((data) {
-            return ChartBar(data);
-          }).toList()
+      child: Container(
+        padding: EdgeInsets.all(10),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: groupTxVals.map((data) {
+          return Flexible(
+            fit: FlexFit.tight,
+            child: ChartBar(
+              data['day'],
+              data['amount'],
+              totalSpending == 0.0
+                  ? 0.0
+                  : (data['amount'] as double) / totalSpending,
+            ),
+          );
+        }).toList()),
       ),
     );
   }

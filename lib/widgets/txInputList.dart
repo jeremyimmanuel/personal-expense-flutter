@@ -43,7 +43,7 @@ class _TxInputListState extends State<TxInputList> {
     return Column(
       children: <Widget>[
         TxInput(_addNewTx),
-        TxList(_userTx),
+        // TxList(_userTx),
       ],
     );
   }

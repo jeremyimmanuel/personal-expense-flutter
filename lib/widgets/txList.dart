@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../models/transaction.dart';
 import './txCard.dart';
+import './noTx.dart';
 
 class TxList extends StatelessWidget {
   final List<Transaction> transactions;
+  final Function delTx;
 
-  TxList(this.transactions);
+  TxList(this.transactions, this.delTx);
 
   Widget buildCard(Transaction tx) {
     return Container(
@@ -17,33 +20,50 @@ class TxList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 500,
-      child: transactions.length != 0
-          ? ListView.builder(
-              itemCount: transactions.length,
-              itemBuilder: (context, idx) {
-                return buildCard(transactions[idx]);
-              },
-              // children: transactions.map(buildCard).toList(),
-            )
-          : Column(
-              children: <Widget>[
-                Text(
-                  'No transactions added yet!',
-                  style: Theme.of(context).textTheme.title,
+    return transactions.length != 0
+        ? ListView.builder(
+            itemCount: transactions.length,
+            itemBuilder: (context, idx) {
+              return Card(
+                elevation: 5,
+                margin: EdgeInsets.symmetric(
+                  vertical: 8,
+                  horizontal: 10,
                 ),
-                SizedBox(
-                  height: 50,
+                child: ListTile(
+                  leading: CircleAvatar(
+                    radius: 30,
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: FittedBox(
+                        child: Text('\$${transactions[idx].amount}'),
+                      ),
+                    ),
+                  ),
+                  title: Text(
+                    transactions[idx].title,
+                    style: Theme.of(context).textTheme.title,
+                  ),
+                  subtitle: Text(
+                    DateFormat.yMMMd().format(transactions[idx].date),
+                  ),
+                  trailing: MediaQuery.of(context).size.width > 450
+                      ? FlatButton.icon(
+                          icon: Icon(Icons.delete),
+                          label: Text('Delete'),
+                          textColor: Theme.of(context).errorColor,
+                          onPressed: () => delTx(transactions[idx].id),
+                        )
+                      : IconButton(
+                          icon: Icon(Icons.delete),
+                          color: Theme.of(context).errorColor,
+                          onPressed: () => delTx(transactions[idx].id),
+                        ),
                 ),
-                Container(
-                    height: 200,
-                    child: Image.asset(
-                      'assets/images/waiting.png',
-                      fit: BoxFit.cover,
-                    )),
-              ],
-            ),
-    );
+              );
+            },
+            // children: transactions.map(buildCard).toList(),
+          )
+        : NoTx();
   }
 }

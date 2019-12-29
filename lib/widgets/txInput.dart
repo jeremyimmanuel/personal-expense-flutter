@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../models/transaction.dart';
 
@@ -12,56 +13,104 @@ class TxInput extends StatefulWidget {
 }
 
 class _TxInputState extends State<TxInput> {
-  final TextEditingController titleController = TextEditingController();
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _amountController = TextEditingController();
+  DateTime _selectedDate;
 
-  final TextEditingController amountController = TextEditingController();
+  void _submitData() {
+    if (_amountController.text.isEmpty) return;
 
-  void submitData() {
-    final enteredTitle = titleController.text;
-    final enteredAmount = double.parse(amountController.text);
+    final enteredTitle = _titleController.text;
+    final enteredAmount = double.parse(_amountController.text);
 
-    if (enteredTitle.isEmpty || enteredAmount <= 0) return;
+    if (enteredTitle.isEmpty || enteredAmount <= 0 || _selectedDate == null)
+      return;
 
     widget.addTx(
       enteredTitle,
       enteredAmount,
+      _selectedDate,
     );
 
     // Closes the most top widget
     Navigator.of(context).pop();
   }
 
+  void _presentDatePicket() {
+    showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2019),
+      lastDate: DateTime.now(),
+    ).then((pickedDate) {
+      if (pickedDate == null) return;
+
+      setState(() {
+        _selectedDate = pickedDate;
+      });
+    });
+    print('bruh');
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.all(10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: <Widget>[
-          TextField(
-            controller: titleController,
-            decoration: InputDecoration(hintText: 'Title'),
-            // autofocus: true,
-            cursorColor: Colors.black,
-            // onSubmitted: (_) => submitData(),
-            // onChanged: print,
-          ),
-          TextField(
-            controller: amountController,
-            decoration: InputDecoration(hintText: 'Amount'),
-            autofocus: true,
-            keyboardType: TextInputType.number,
-            // onSubmitted: (_) => submitData(),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 8),
-            child: FlatButton(
-              child: Text('Add Transaction'),
-              textColor: Colors.purple,
-              onPressed: submitData,
+    return SingleChildScrollView(
+      child: Container(
+        margin: EdgeInsets.only(
+          top: 10,
+          left: 10,
+          right: 10,
+          bottom: MediaQuery.of(context).viewInsets.bottom + 10,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: <Widget>[
+            TextField(
+              controller: _titleController,
+              decoration: InputDecoration(hintText: 'Title'),
+              // autofocus: true,
+              cursorColor: Colors.black,
+              // onSubmitted: (_) => submitData(),
+              // onChanged: print,
             ),
-          )
-        ],
+            TextField(
+              controller: _amountController,
+              decoration: InputDecoration(hintText: 'Amount'),
+              autofocus: true,
+              keyboardType: TextInputType.number,
+              // onSubmitted: (_) => submitData(),
+            ),
+            Container(
+              height: 70,
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Text(_selectedDate == null
+                        ? 'No Date Chosen!'
+                        : DateFormat.yMd().format(_selectedDate)),
+                  ),
+                  FlatButton(
+                    child: Text(
+                      'Pick Date',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    onPressed: _presentDatePicket,
+                    textColor: Theme.of(context).primaryColor,
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: RaisedButton(
+                child: Text('Add Transaction'),
+                color: Theme.of(context).primaryColor,
+                textColor: Theme.of(context).textTheme.button.color,
+                onPressed: _submitData,
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
