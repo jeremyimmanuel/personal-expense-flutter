@@ -34,7 +34,6 @@ class _TxInputListState extends State<TxInputList> {
         id: DateTime.now().toString());
     setState(() {
       _userTx.add(tx);
-      print('Amount of transactions: ${_userTx.length}');
     });
   }
 

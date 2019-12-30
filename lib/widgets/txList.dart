@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../models/transaction.dart';
 import './txCard.dart';
 import './noTx.dart';
+import './txCardList.dart';
 
 class TxList extends StatelessWidget {
   final List<Transaction> transactions;
@@ -24,43 +25,7 @@ class TxList extends StatelessWidget {
         ? ListView.builder(
             itemCount: transactions.length,
             itemBuilder: (context, idx) {
-              return Card(
-                elevation: 5,
-                margin: EdgeInsets.symmetric(
-                  vertical: 8,
-                  horizontal: 10,
-                ),
-                child: ListTile(
-                  leading: CircleAvatar(
-                    radius: 30,
-                    child: Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: FittedBox(
-                        child: Text('\$${transactions[idx].amount}'),
-                      ),
-                    ),
-                  ),
-                  title: Text(
-                    transactions[idx].title,
-                    style: Theme.of(context).textTheme.title,
-                  ),
-                  subtitle: Text(
-                    DateFormat.yMMMd().format(transactions[idx].date),
-                  ),
-                  trailing: MediaQuery.of(context).size.width > 450
-                      ? FlatButton.icon(
-                          icon: Icon(Icons.delete),
-                          label: Text('Delete'),
-                          textColor: Theme.of(context).errorColor,
-                          onPressed: () => delTx(transactions[idx].id),
-                        )
-                      : IconButton(
-                          icon: Icon(Icons.delete),
-                          color: Theme.of(context).errorColor,
-                          onPressed: () => delTx(transactions[idx].id),
-                        ),
-                ),
-              );
+              return TxCardList(transactions[idx], delTx);
             },
             // children: transactions.map(buildCard).toList(),
           )

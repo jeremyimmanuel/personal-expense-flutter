@@ -7,7 +7,7 @@ class ChartBar extends StatelessWidget {
   /// percentage of the amount to the weekly amoun
   final double percentageOfSpending;
 
-  ChartBar(this.label, this.amount, this.percentageOfSpending);
+  const ChartBar(this.label, this.amount, this.percentageOfSpending);
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +40,7 @@ class ChartBar extends StatelessWidget {
                     heightFactor: percentageOfSpending,
                     child: Container(
                       decoration: BoxDecoration(
-                          color: Theme.of(context).primaryColor,
+                          color: Theme.of(ctx).primaryColor,
                           borderRadius: BorderRadius.circular(10)),
                     ),
                   )

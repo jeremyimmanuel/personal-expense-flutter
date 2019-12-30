@@ -9,6 +9,7 @@ import './models/transaction.dart';
 import './widgets/txInput.dart';
 import './widgets/txList.dart';
 import 'models/transaction.dart';
+import 'models/myTheme.dart';
 
 void main() {
   // SystemChrome.setPreferredOrientations([
@@ -25,28 +26,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Personal Expenses',
-      theme: ThemeData(
-        primarySwatch: Colors.purple,
-        accentColor: Colors.amberAccent,
-        fontFamily: 'Quicksand',
-        textTheme: ThemeData.light().textTheme.copyWith(
-              title: TextStyle(
-                fontFamily: 'Open Sans',
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-              ),
-              button: TextStyle(color: Colors.white),
-            ),
-        appBarTheme: AppBarTheme(
-          textTheme: ThemeData.light().textTheme.copyWith(
-                title: TextStyle(
-                  fontFamily: 'Open Sans',
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-        ),
-      ),
+      theme: MyTheme().light,
       home: MyHomePage(),
     );
   }
@@ -57,14 +37,33 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver  {
   final List<Transaction> _userTx = [
     Transaction(
-        id: 't1', title: 'New Shoes', amount: 69.99, date: DateTime.now()),
+        id: 't1', title: 'New Shoes', amount: 69.99, date: DateTime.now().subtract(Duration(days: 1))),
     Transaction(
-        id: 't2', title: 'Groceries', amount: 16.53, date: DateTime.now())
+        id: 't2', title: 'Groceries', amount: 16.53, date: DateTime.now()),
+    Transaction(
+        id: 't3', title: 'Going out', amount: 29.99, date: DateTime.now().subtract(Duration(days: 2))),
   ];
   bool _showChart = false;
+
+  @override
+  void initState() { 
+    WidgetsBinding.instance.addObserver(this);
+    super.initState(); 
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state){
+    print(state);
+  }
+  
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
 
   void _addNewTx(String title, double amount, DateTime chosenDate) {
     final tx = Transaction(
@@ -72,10 +71,8 @@ class _MyHomePageState extends State<MyHomePage> {
         amount: amount,
         date: chosenDate,
         id: DateTime.now().toString());
-    print('_addNewTx');
     setState(() {
       _userTx.add(tx);
-      print('Amount of transactions: ${_userTx.length}');
     });
   }
 
@@ -105,35 +102,90 @@ class _MyHomePageState extends State<MyHomePage> {
         });
   }
 
+  CupertinoNavigationBar _buildCupertinoAppBar() {
+    return CupertinoNavigationBar(
+      middle: Text('Personal Expenses App'),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          GestureDetector(
+            child: Icon(CupertinoIcons.add),
+            onTap: () => _startAddNewTx(context),
+          ),
+        ],
+      ),
+    );
+  }
+
+  AppBar _buildMaterialAppBar() {
+    return AppBar(
+      // backgroundColor: Colors.cyan,
+      title: Text('Personal Expenses'),
+      actions: <Widget>[
+        IconButton(
+          icon: Icon(Icons.add),
+          onPressed: () => _startAddNewTx(context),
+        )
+      ],
+    );
+  }
+
+  List<Widget> _buildLanscapeContent(
+      MediaQueryData mediaQuery, PreferredSizeWidget appBar, Widget txList) {
+    return [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text(
+            'Show Chart',
+            style: Theme.of(context).textTheme.title,
+          ),
+          Switch.adaptive(
+            activeColor: Theme.of(context).accentColor,
+            value: _showChart,
+            onChanged: (val) {
+              setState(() {
+                _showChart = val;
+              });
+            },
+          ),
+        ],
+      ),
+      _showChart
+          ? Container(
+              height: (mediaQuery.size.height -
+                      appBar.preferredSize.height -
+                      mediaQuery.padding.top) *
+                  .7,
+              child: Chart(_userTx),
+            )
+          : txList,
+    ];
+  }
+
+  List<Widget> _buildPortraitContent(
+      MediaQueryData mediaQuery, PreferredSizeWidget appBar, Widget txList) {
+    return [
+      Container(
+        height: (mediaQuery.size.height -
+                appBar.preferredSize.height -
+                mediaQuery.padding.top) *
+            .3,
+        child: Chart(_userTx),
+      ),
+      txList,
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
+    // print('build() for MyHomePage()');
     final mediaQuery = MediaQuery.of(context);
 
     final isLandscape = mediaQuery.orientation == Orientation.landscape;
 
-    final PreferredSizeWidget appBar = Platform.isIOS
-        ? CupertinoNavigationBar(
-            middle: Text('Personal Expenses App'),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                GestureDetector(
-                  child: Icon(CupertinoIcons.add),
-                  onTap: () => _startAddNewTx(context),
-                ),
-              ],
-            ),
-          )
-        : AppBar(
-            // backgroundColor: Colors.cyan,
-            title: Text('Personal Expenses'),
-            actions: <Widget>[
-              IconButton(
-                icon: Icon(Icons.add),
-                onPressed: () => _startAddNewTx(context),
-              )
-            ],
-          );
+    final PreferredSizeWidget appBar =
+        Platform.isIOS ? _buildCupertinoAppBar() : _buildMaterialAppBar();
 
     final txListWidget = Container(
       height: (mediaQuery.size.height -
@@ -148,43 +200,17 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           children: <Widget>[
             if (isLandscape)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text(
-                    'Show Chart',
-                    style: Theme.of(context).textTheme.title,
-                  ),
-                  Switch.adaptive(
-                    activeColor: Theme.of(context).accentColor,
-                    value: _showChart,
-                    onChanged: (val) {
-                      setState(() {
-                        _showChart = val;
-                      });
-                    },
-                  ),
-                ],
+              ..._buildLanscapeContent(
+                mediaQuery,
+                appBar,
+                txListWidget,
               ),
             if (!isLandscape)
-              Container(
-                height: (mediaQuery.size.height -
-                        appBar.preferredSize.height -
-                        mediaQuery.padding.top) *
-                    .3,
-                child: Chart(_userTx),
+              ..._buildPortraitContent(
+                mediaQuery,
+                appBar,
+                txListWidget,
               ),
-            if (!isLandscape) txListWidget,
-            if (isLandscape)
-              _showChart
-                  ? Container(
-                      height: (mediaQuery.size.height -
-                              appBar.preferredSize.height -
-                              mediaQuery.padding.top) *
-                          .7,
-                      child: Chart(_userTx),
-                    )
-                  : txListWidget,
           ],
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,

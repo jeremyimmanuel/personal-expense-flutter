@@ -7,16 +7,43 @@ import '../widgets/adaptiveButton.dart';
 class TxInput extends StatefulWidget {
   final Function addTx;
 
-  TxInput(this.addTx);
+  TxInput(this.addTx) {
+    print('Constructor for TxInput Widget');
+  }
 
   @override
-  _TxInputState createState() => _TxInputState();
+  _TxInputState createState() {
+    print('createState for TxInput called');
+    return _TxInputState();
+  }
 }
 
 class _TxInputState extends State<TxInput> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _amountController = TextEditingController();
   DateTime _selectedDate;
+
+  _TxInputState(){
+    // print('Constructor for TxInputState');
+  }
+
+  @override
+  void initState() {
+    // print('initState for TxInputState');
+    super.initState();
+  }
+
+  @override
+  void didUpdateWidget (TxInput oldWidget) {
+    // print('didUpdateWidget');
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
+  void dispose() {
+    // print('dispose');
+    super.dispose();
+  }
 
   void _submitData() {
     if (_amountController.text.isEmpty) return;
@@ -50,7 +77,6 @@ class _TxInputState extends State<TxInput> {
         _selectedDate = pickedDate;
       });
     });
-    print('bruh');
   }
 
   @override
